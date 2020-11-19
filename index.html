@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://threejs.org/build/three.min.js" charset="utf-8"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script type="text/javascript" src="DoHyeon_Regular.js"></script>
+
+    <script>
+
+        var renderer, scene, camera, controls
+        var WIDTH, HEIGHT;
+        var mesh, mesh2;
+        let text,spotLight ;
+
+        stageResize();
+        init();
+
+        function init() {
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(WIDTH, HEIGHT);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+            renderer.setClearColor(0xffffff);
+
+            camera = new THREE.PerspectiveCamera(100, WIDTH / HEIGHT, .1, 1000);
+            camera.position.set(246, -5, 40);
+
+            scene = new THREE.Scene();
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            //controls.update() must be called after any manual changes to the camera's transform
+            camera.position.set(0, 20, 100);
+            controls.update();
+
+            // controls.minDistance = 50;
+
+            spotLight = new THREE.SpotLight(0xffffff);
+            spotLight.position.set(600, 600, 600);
+            scene.add(spotLight);
+
+
+
+            var imageLoader = new THREE.TextureLoader();
+            imageLoader.load("https://ucarecdn.com/a7f91b3f-a1e3-4118-bf1f-59e1262d2fbb/universe2_low_3.jpg", function (data) {
+                var material_univ = new THREE.MeshBasicMaterial({
+                    map: data
+                    , side: THREE.DoubleSide
+                })
+                // var material_univ = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
+                var geometry_univ = new THREE.SphereGeometry(400, 32, 32);
+                mesh = new THREE.Mesh(geometry_univ, material_univ);
+                // mesh.position.set(0, 0, 0);
+                scene.add(mesh);
+
+
+                var material_2 = new THREE.MeshLambertMaterial({ color: 0x00b7ff });
+                var geometry_2 = new THREE.SphereGeometry(50, 32, 32);
+                mesh2 = new THREE.Mesh(geometry_2, material_2);
+                // scene.add(mesh2);
+
+                let loader = new THREE.FontLoader();
+
+                let font = loader.parse(fontJSON);
+
+                let geometry = new THREE.TextGeometry("신나는_메이커톤!_Enlight와_함께하세요!_:)",{font:font, size:10,height:1});
+
+                let material = new THREE.MeshBasicMaterial({color:0x035b59});
+
+                text = new THREE.Mesh(geometry, material);
+
+                text.position.x = -140;
+
+                scene.add(text);
+
+                mesh2 = new THREE.Mesh(geometry_2, material_2);
+                // scene.add(mesh2);
+
+
+
+            });
+
+            render();
+        }
+        let status = "up";
+        function render() {
+            if(text != undefined){
+                console.log(text)
+                if(status == "up"){
+                    text.scale.x += 0.007;
+                }
+                if(status == "down"){
+                    text.scale.x -= 0.007;
+                }
+
+                if(text.scale.x > 1.5){
+                    status = "down";
+                }
+                if(text.scale.x < 1){
+                    status = "up";
+                }
+            }
+            renderer.render(scene, camera);
+
+            requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', stageResize);
+
+        function stageResize() {
+            WIDTH = window.innerWidth;
+            HEIGHT = window.innerHeight;
+
+            if (renderer != undefined) {
+                renderer.setSize(WIDTH, HEIGHT);
+                camera.aspect = WIDTH / HEIGHT;
+                camera.updateProjectionMatrix();
+            }
+        }
+
+    </script>
+</body>
+
+</html>
